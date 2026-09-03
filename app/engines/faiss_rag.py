@@ -42,13 +42,15 @@ class FaissMemory:
             inst._current_id = 0
             inst.metadata_store: Dict[int, Dict[str, Any]] = {}
 
-            # Lazy-load embedding service
-            try:
-                from app.services.memory.embedding import MemoryEmbeddingService
-                inst.embedding = MemoryEmbeddingService()
-            except Exception as exc:
-                logger.error(f"[FAISS] Embedding service init failed: {exc}")
-                inst.embedding = None
+            # The embedding model is optional. Do not load it on small hosts
+            # when FAISS itself is unavailable.
+            inst.embedding = None
+            if FAISS_AVAILABLE:
+                try:
+                    from app.services.memory.embedding import MemoryEmbeddingService
+                    inst.embedding = MemoryEmbeddingService()
+                except Exception as exc:
+                    logger.error(f"[FAISS] Embedding service init failed: {exc}")
 
             # Init FAISS index
             if FAISS_AVAILABLE:
