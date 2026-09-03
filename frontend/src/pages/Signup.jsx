@@ -51,7 +51,7 @@ export default function Signup() {
     setLoading(true);
     setError(null);
     try {
-      await api.post('/auth/request-otp', { email: form.email });
+      await api.post('/auth/request-otp', { email: form.email }, { timeout: 30000 });
       toast.success(`Verification code sent to ${form.email}`);
       setStep('otp');
       setCooldown(RESEND_COOLDOWN);
@@ -67,7 +67,7 @@ export default function Signup() {
     setLoading(true);
     setError(null);
     try {
-      await api.post('/auth/request-otp', { email: form.email });
+      await api.post('/auth/request-otp', { email: form.email }, { timeout: 30000 });
       toast.success('A new code has been sent.');
       setCooldown(RESEND_COOLDOWN);
     } catch (err) {
