@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     SMTP_USER: str = os.getenv("SMTP_USER", "")
     SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
     EMAILS_FROM_EMAIL: str = os.getenv("EMAILS_FROM_EMAIL", "no-reply@civicsetu.gov.in")
+    RESEND_API_KEY: str = os.getenv("RESEND_API_KEY", "")
 
     # AWS S3 Storage settings
     S3_BUCKET: str = os.getenv("S3_BUCKET", "")

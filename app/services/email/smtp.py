@@ -1,16 +1,44 @@
 import smtplib
 import logging
 import asyncio
+import json
+import urllib.request
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
+def send_via_resend(email_to: str, subject: str, html_content: str) -> None:
+    """Send email through Resend's HTTPS API, which works on Render free tier."""
+    payload = json.dumps({
+        "from": settings.EMAILS_FROM_EMAIL,
+        "to": [email_to],
+        "subject": subject,
+        "html": html_content,
+    }).encode("utf-8")
+    request = urllib.request.Request(
+        "https://api.resend.com/emails",
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=15) as response:
+        if response.status >= 300:
+            raise RuntimeError(f"Resend returned HTTP {response.status}")
+
 def sync_send_email(email_to: str, subject: str, html_content: str) -> None:
     """
     Synchronous email dispatch using smtplib.
     """
+    if settings.RESEND_API_KEY:
+        send_via_resend(email_to, subject, html_content)
+        logger.info("Successfully sent email via Resend to %s", email_to)
+        return
+
     if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
         raise RuntimeError("SMTP_USER and SMTP_PASSWORD are not configured")
 
