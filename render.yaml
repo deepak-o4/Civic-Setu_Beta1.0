@@ -17,6 +17,8 @@ services:
         generateValue: true
       - key: REDIS_URL
         value: ""
+      - key: FRONTEND_ORIGINS
+        value: https://civicsetu-frontend-auez.onrender.com
       - key: GROQ_API_KEY
         sync: false
       - key: GEMINI_API_KEY
