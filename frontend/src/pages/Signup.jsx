@@ -3,14 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, User as UserIcon, ArrowRight, AlertCircle, ShieldCheck, KeyRound, RotateCcw } from 'lucide-react';
+import { Mail, Lock, User as UserIcon, ArrowRight, AlertCircle, Phone, ShieldCheck } from 'lucide-react';
 import AnimatedPage from '../components/AnimatedPage';
 import LanguageToggle from '../components/LanguageToggle';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { getHomeForRole } from '../utils/roleHome';
-
-const RESEND_COOLDOWN = 60;
 
 export default function Signup() {
   const { t } = useTranslation();
@@ -24,22 +22,12 @@ export default function Signup() {
     }
   }, [user, role, navigate]);
 
-  const [step, setStep] = useState('details'); // 'details' | 'otp'
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
-  const [otp, setOtp] = useState('');
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [cooldown, setCooldown] = useState(0);
-
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
-    return () => clearTimeout(t);
-  }, [cooldown]);
-
-  const handleSendOtp = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.password) {
+    if (!form.name || !form.email || !form.phone || !form.password) {
       setError('Please fill in all fields.');
       return;
     }
@@ -47,52 +35,19 @@ export default function Signup() {
       setError('Password must be at least 6 characters.');
       return;
     }
-
-    setLoading(true);
-    setError(null);
-    try {
-      await api.post('/auth/request-otp', { email: form.email }, { timeout: 30000 });
-      toast.success(`Verification code sent to ${form.email}`);
-      setStep('otp');
-      setCooldown(RESEND_COOLDOWN);
-    } catch (err) {
-      setError(err.message || 'Could not send verification code. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResendOtp = async () => {
-    if (cooldown > 0) return;
-    setLoading(true);
-    setError(null);
-    try {
-      await api.post('/auth/request-otp', { email: form.email }, { timeout: 30000 });
-      toast.success('A new code has been sent.');
-      setCooldown(RESEND_COOLDOWN);
-    } catch (err) {
-      setError(err.message || 'Could not resend code.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyAndCreate = async (e) => {
-    e.preventDefault();
-    if (!/^\d{6}$/.test(otp)) {
-      setError('Enter the 6-digit code from your email.');
+    if (!/^\+?[1-9]\d{7,14}$/.test(form.phone)) {
+      setError('Please enter a valid mobile number.');
       return;
     }
 
     setLoading(true);
     setError(null);
     try {
-      await api.post('/auth/verify-otp', { email: form.email, otp });
       await api.post('/auth/signup', form);
-      toast.success('Account created and email verified! Please log in.');
+      toast.success('Account created successfully. Please log in.');
       navigate('/login');
     } catch (err) {
-      setError(err.message || 'Verification failed. Please try again.');
+      setError(err.message || 'Could not create your account. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -117,12 +72,10 @@ export default function Signup() {
         >
           <div className="text-left mb-8 space-y-2">
             <h1 className="font-display text-3xl font-extrabold text-ink tracking-tight">
-              {step === 'details' ? t('auth.createAccount') : t('auth.verifyEmail')}
+              {t('auth.createAccount')}
             </h1>
             <p className="text-muted font-medium">
-              {step === 'details'
-                ? t('auth.signupSubtitle')
-                : <>{t('auth.codeSentTo')} <span className="font-semibold text-ink">{form.email}</span></>}
+              {t('auth.signupSubtitle')}
             </p>
           </div>
 
@@ -141,16 +94,12 @@ export default function Signup() {
               )}
             </AnimatePresence>
 
-            <AnimatePresence mode="wait">
-              {step === 'details' ? (
-                <motion.form
-                  key="details"
-                  initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -12 }}
-                  onSubmit={handleSendOtp}
-                  className="space-y-5"
-                >
+            <motion.form
+              initial={{ opacity: 0, x: -12 }}
+              animate={{ opacity: 1, x: 0 }}
+              onSubmit={handleSubmit}
+              className="space-y-5"
+            >
                   <div className="space-y-1.5 group">
                     <label className="text-sm font-semibold text-ink/70 ml-1 group-focus-within:text-primary-700 transition-colors">{t('auth.fullName')}</label>
                     <div className="relative">
@@ -163,6 +112,23 @@ export default function Signup() {
                         placeholder="John Doe"
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
+                        className="input-field pl-11"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 group">
+                    <label className="text-sm font-semibold text-ink/70 ml-1 group-focus-within:text-primary-700 transition-colors">Mobile Number</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <Phone className="h-5 w-5 text-muted group-focus-within:text-primary-600 transition-colors" />
+                      </div>
+                      <input
+                        type="tel"
+                        required
+                        placeholder="9876543210"
+                        value={form.phone}
+                        onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/[^+\d]/g, '') })}
                         className="input-field pl-11"
                       />
                     </div>
@@ -211,77 +177,12 @@ export default function Signup() {
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : (
                       <>
-                        {t('auth.sendCode')}
+                        Create Account
                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform opacity-90" />
                       </>
                     )}
                   </button>
                 </motion.form>
-              ) : (
-                <motion.form
-                  key="otp"
-                  initial={{ opacity: 0, x: 12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 12 }}
-                  onSubmit={handleVerifyAndCreate}
-                  className="space-y-5"
-                >
-                  <div className="space-y-1.5 group">
-                    <label className="text-sm font-semibold text-ink/70 ml-1 group-focus-within:text-primary-700 transition-colors">{t('auth.sixDigitCode')}</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <KeyRound className="h-5 w-5 text-muted group-focus-within:text-primary-600 transition-colors" />
-                      </div>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={6}
-                        required
-                        placeholder="123456"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        className="input-field pl-11 tracking-[0.5em] font-bold text-center"
-                      />
-                    </div>
-                    <p className="text-xs text-muted ml-1">{t('auth.codeExpiry')}</p>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className={`btn-secondary w-full mt-2 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
-                  >
-                    {loading ? (
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <>
-                        {t('auth.verifyAndCreate')}
-                        <ShieldCheck className="w-5 h-5 opacity-90" />
-                      </>
-                    )}
-                  </button>
-
-                  <div className="flex items-center justify-between text-sm pt-1">
-                    <button
-                      type="button"
-                      onClick={() => { setStep('details'); setError(null); }}
-                      className="text-muted hover:text-ink font-medium"
-                    >
-                      &larr; {t('auth.editDetails')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleResendOtp}
-                      disabled={cooldown > 0 || loading}
-                      className="flex items-center gap-1.5 text-primary-700 hover:text-primary-800 font-bold disabled:text-muted disabled:cursor-not-allowed"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      {cooldown > 0 ? t('auth.resendIn', { seconds: cooldown }) : t('auth.resendCode')}
-                    </button>
-                  </div>
-                </motion.form>
-              )}
-            </AnimatePresence>
 
             <p className="mt-8 text-center text-sm text-muted font-medium">
               {t('auth.alreadyHaveAccount')}{' '}

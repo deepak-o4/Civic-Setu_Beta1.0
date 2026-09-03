@@ -251,6 +251,7 @@ async def signup(
             )
 
         existing_user.name = payload.name.title()
+        existing_user.phone = payload.phone
         existing_user.password = hashed_password
         existing_user.role = user_role
         await db.commit()
@@ -261,6 +262,7 @@ async def signup(
     user = User(
         name=payload.name.title(),
         email=email,
+        phone=payload.phone,
         password=hashed_password,
         role=user_role
     )

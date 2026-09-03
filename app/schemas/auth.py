@@ -11,6 +11,7 @@ class OTPVerify(BaseModel):
 class SignupRequest(BaseModel):
     name: str = Field(..., min_length=2, max_length=100)
     email: EmailStr
+    phone: str = Field(..., pattern=r"^\+?[1-9]\d{7,14}$", description="Mobile number in international format")
     password: str = Field(..., min_length=6, description="Password must be at least 6 characters")
     role: str = Field("CITIZEN", description="Role: CITIZEN, OFFICER, etc.")
 
