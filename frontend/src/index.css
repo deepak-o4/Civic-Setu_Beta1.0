@@ -1,0 +1,102 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+:root {
+  --grain-opacity: 0.035;
+  /* Centralized typography system — CivicSetu brand fonts (Fontshare) */
+  --font-display: "Clash Display", "Inter", Arial, sans-serif;
+  --font-body: "Satoshi", "Inter", Arial, sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Subtle "signal pulse" used by SubtleCivicBackground on the landing page —
+   a slow, soft breathing dot representing a complaint being detected/routed.
+   Deliberately gentle: low peak opacity, slow duration, no sharp motion. */
+@keyframes civicPulse {
+  0%, 100% { transform: scale(1); opacity: 0.06; }
+  50% { transform: scale(2.2); opacity: 0.16; }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    width: 100%;
+    min-height: 100%;
+  }
+  body {
+    @apply bg-background text-ink font-sans antialiased;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+  }
+  #root {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+  ::selection {
+    background: #C6F135;
+    color: #0B1F1B;
+  }
+}
+
+@layer components {
+  /* Buttons — Finch-style pills */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-accent text-ink rounded-full font-bold text-sm shadow-soft hover:bg-accent-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-ink text-white rounded-full font-bold text-sm hover:bg-ink-700 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-transparent text-ink border-2 border-ink/15 rounded-full font-bold text-sm hover:border-ink hover:bg-ink hover:text-white transition-all duration-200;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-semibold text-sm text-muted hover:text-ink hover:bg-ink/5 transition-all duration-200;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white rounded-3xl border border-ink/5 shadow-card;
+  }
+
+  .card-dark {
+    @apply bg-ink text-white rounded-3xl border border-white/10 shadow-soft;
+  }
+
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-soft rounded-3xl;
+  }
+
+  .pill-tag {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-accent/20 text-primary-800 border border-accent/40;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-white border-2 border-ink/10 rounded-2xl focus:ring-2 focus:ring-accent/60 focus:border-accent outline-none transition-all placeholder:text-muted/70;
+  }
+
+  .section-heading {
+    @apply font-display font-extrabold tracking-tight text-ink;
+  }
+
+  .blob-decor {
+    @apply absolute rounded-full blur-3xl opacity-40 pointer-events-none;
+  }
+}

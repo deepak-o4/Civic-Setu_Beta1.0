@@ -1,0 +1,165 @@
+import logging
+from typing import Dict, Any, List
+import numpy as np
+from .model_loader import ModelLoader
+from app.ml.embeddings import EmbeddingService
+
+logger = logging.getLogger(__name__)
+
+class MLInferenceService:
+    """
+    Service layer providing inference functionality using fine-tuned models.
+    """
+    def __init__(self):
+        self.loader = ModelLoader()
+        self.loader.load_models()
+        self.embedder = EmbeddingService()
+        
+    def get_embeddings(self, text: str) -> List[float]:
+        """
+        Generates BERT embeddings for the given text.
+        """
+        try:
+            embeddings_matrix = self.embedder.generate_embeddings([text])
+            return embeddings_matrix[0].tolist()
+        except Exception as e:
+            logger.error(f"Error generating embeddings: {e}")
+            return []
+        
+    def predict(self, text: str) -> Dict[str, Any]:
+        """
+        Runs the main classifier on the provided text.
+        Returns predicted categories and confidence scores.
+        """
+        try:
+            embeddings = self.get_embeddings(text)
+            if not embeddings:
+                return self._fallback_predict(text)
+                
+            X_input = np.array([embeddings])
+            
+            classifier = self.loader.get_classifier()
+            encoders = self.loader.get_encoders()
+            
+            if not classifier or not encoders or 'category' not in encoders:
+                logger.warning("Models not fully loaded. Returning fallback predictions.")
+                return self._fallback_predict(text)
+
+            # Predict Categories (Multi-label from NNTrainer)
+            # Depending on if it's PyTorch NNTrainer or sklearn
+            if hasattr(classifier, 'predict'):
+                if type(classifier).__name__ == "NNTrainer":
+                    preds, probs = classifier.predict(X_input)
+                    preds = preds[0]
+                    probs = probs[0]
+                    
+                    class_names = encoders['category'].classes_
+                    predicted_labels = []
+                    confidences = []
+                    for i, is_pred in enumerate(preds):
+                        if is_pred == 1:
+                            predicted_labels.append(class_names[i])
+                            confidences.append(float(probs[i]))
+                            
+                    avg_conf = sum(confidences) / len(confidences) if confidences else 0.5
+                    
+                    if not predicted_labels:
+                        predicted_labels = ["OTHER"]
+                        avg_conf = 0.5
+                        
+                    return {
+                        "category_pred": predicted_labels,
+                        "confidence_score": avg_conf
+                    }
+                else:
+                    # Legacy fallback
+                    cat_probs = classifier.predict_proba(X_input)[0]
+                    cat_idx = np.argmax(cat_probs)
+                    cat_pred = encoders['category'].inverse_transform([cat_idx])[0]
+                    cat_conf = float(cat_probs[cat_idx])
+                    return {
+                        "category_pred": [cat_pred.upper()],
+                        "confidence_score": cat_conf
+                    }
+            return self._fallback_predict(text)
+        except Exception as e:
+            logger.error(f"Inference error: {e}")
+            return self._fallback_predict(text)
+            
+    def _fallback_predict(self, text: str = None) -> Dict[str, Any]:
+        if text:
+            try:
+                from app.services.ai.groq_classifier import GroqClassifier
+                groq_clf = GroqClassifier()
+                res = groq_clf.classify(text)
+                category = str(res.get("category", "Other")).upper()
+                return {
+                    "category_pred": [category],
+                    "confidence_score": float(res.get("confidence", 0.90))
+                }
+            except Exception as e:
+                logger.error(f"Fallback GroqClassifier category prediction failed: {e}")
+        return {
+            "category_pred": ["OTHER"],
+            "confidence_score": 0.5
+        }
+
+    def predict_severity(self, text: str) -> str:
+        """
+        Runs the severity classifier on the provided text.
+        Returns predicted severity (LOW, MEDIUM, HIGH, CRITICAL).
+        """
+        try:
+            embeddings = self.get_embeddings(text)
+            if not embeddings:
+                try:
+                    from app.services.ai.groq_classifier import GroqClassifier
+                    groq_clf = GroqClassifier()
+                    res = groq_clf.classify(text)
+                    val = str(res.get("priority", "LOW")).upper()
+                    from app.models.complaint import PriorityEnum
+                    if val in PriorityEnum.__members__:
+                        return val
+                except Exception:
+                    pass
+                return "LOW"
+                
+            X_input = np.array([embeddings])
+            model = self.loader.get_severity_model()
+            encoders = self.loader.get_encoders()
+            
+            if not model or not encoders or 'severity' not in encoders:
+                logger.warning("Severity model not fully loaded. Querying GroqClassifier as fallback.")
+                try:
+                    from app.services.ai.groq_classifier import GroqClassifier
+                    groq_clf = GroqClassifier()
+                    res = groq_clf.classify(text)
+                    val = str(res.get("priority", "LOW")).upper()
+                    from app.models.complaint import PriorityEnum
+                    if val in PriorityEnum.__members__:
+                        return val
+                except Exception as ex:
+                    logger.error(f"Fallback GroqClassifier failed: {ex}")
+                return "LOW"
+
+            pred_idx = model.predict(X_input)[0]
+            pred_label = encoders['severity'].inverse_transform([pred_idx])[0]
+            val = str(pred_label).upper()
+            
+            from app.models.complaint import PriorityEnum
+            if val in PriorityEnum.__members__:
+                return val
+            return "LOW"
+        except Exception as e:
+            logger.error(f"Severity prediction error: {e}")
+            try:
+                from app.services.ai.groq_classifier import GroqClassifier
+                groq_clf = GroqClassifier()
+                res = groq_clf.classify(text)
+                val = str(res.get("priority", "LOW")).upper()
+                from app.models.complaint import PriorityEnum
+                if val in PriorityEnum.__members__:
+                    return val
+            except Exception:
+                pass
+            return "LOW"

@@ -1,0 +1,119 @@
+import React, { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
+import api from '../services/api';
+import AnimatedPage from '../components/AnimatedPage';
+import { FileText, AlertCircle, Clock, CheckCircle, MessageSquareQuote } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { getSocket } from '../services/socket';
+import toast from 'react-hot-toast';
+
+export default function CitizenDashboard() {
+  const { data: complaints = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ['myComplaints'],
+    queryFn: async () => {
+      const res = await api.get('/complaints/my-complaints');
+      return res.data;
+    }
+  });
+
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    const handleStatusUpdate = (data) => {
+      toast.success(`Complaint ${data.ticket_id} status updated to ${data.status}!`);
+      refetch();
+    };
+
+    socket.on("statusUpdated", handleStatusUpdate);
+    return () => socket.off("statusUpdated", handleStatusUpdate);
+  }, [refetch]);
+
+  const getStatusColor = (status) => {
+    switch(status?.toLowerCase()) {
+      case 'resolved': 
+      case 'completed':
+        return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+      case 'in_progress': 
+      case 'processing':
+        return 'bg-primary-100 text-primary-800 border-primary-200';
+      case 'rejected': 
+      case 'closed':
+      case 'failed':
+      case 'failed_final':
+      case 'escalated':
+        return 'bg-rose-100 text-rose-700 border-rose-200';
+      case 'assigned':
+        return 'bg-amber-100 text-amber-700 border-amber-200';
+      default: 
+        return 'bg-ink/5 text-ink/80 border-ink/10';
+    }
+  };
+
+  return (
+    <AnimatedPage className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-extrabold text-ink tracking-tight">My Complaints</h1>
+        <p className="text-muted mt-1">View and track the status of your submitted complaints.</p>
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center p-12">
+          <div className="w-8 h-8 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
+        </div>
+      ) : isError ? (
+        <div className="bg-rose-50 text-rose-600 p-4 rounded-xl flex items-center gap-3">
+          <AlertCircle className="w-5 h-5" />
+          <span>Failed to load your complaints.</span>
+        </div>
+      ) : complaints.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-ink/10 p-12 text-center shadow-sm">
+          <div className="w-16 h-16 bg-background rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <FileText className="w-8 h-8 text-muted/70" />
+          </div>
+          <h3 className="text-lg font-bold text-ink mb-1">No Complaints Found</h3>
+          <p className="text-muted">You haven't submitted any complaints yet.</p>
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {complaints.map((c, i) => (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              key={c.ticket_id} 
+              className="bg-white rounded-2xl border border-ink/10 p-5 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className="font-mono text-sm font-bold text-muted">{c.ticket_id}</span>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${getStatusColor(c.status)}`}>
+                      {c.status}
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-ink text-lg">Category: {c.category}</h3>
+                  <div className="text-sm text-muted flex items-center gap-4 mt-2">
+                    <span className="flex items-center gap-1.5"><AlertCircle className="w-4 h-4"/> Priority: {c.priority}</span>
+                    <span className="flex items-center gap-1.5"><Clock className="w-4 h-4"/> {new Date(c.created_at).toLocaleDateString()}</span>
+                  </div>
+                </div>
+
+                {c.status?.toUpperCase() === 'RESOLVED' && (
+                  <Link
+                    to={`/dashboard/feedback?ticket_id=${c.ticket_id}`}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl font-bold transition-all text-sm self-start sm:self-center"
+                  >
+                    <MessageSquareQuote className="w-4 h-4" />
+                    Provide Feedback
+                  </Link>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </AnimatedPage>
+  );
+}

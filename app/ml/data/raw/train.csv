@@ -1,0 +1,56 @@
+text,category,severity,source_complaint_type,source_agency
+"We are experiencing Pothole (Street Condition) in our neighborhood, Queens.",Roads,medium,Street Condition,DOT
+"We are experiencing Pothole (Street Condition) in our neighborhood, Queens.",Roads,medium,Street Condition,DOT
+"We are experiencing Banging/Pounding (Noise - Residential) in our neighborhood, Queens.",Security,low,Noise - Residential,NYPD
+There is a Loud Music/Party issue reported as Noise - Commercial near my area in Brooklyn.,Security,low,Noise - Commercial,NYPD
+There is a Loud Talking issue reported as Noise - Street/Sidewalk near my area in Queens.,Roads,low,Noise - Street/Sidewalk,NYPD
+Urgent: Double Parked Blocking Vehicle related to Illegal Parking needs attention in Brooklyn.,Roads,medium,Illegal Parking,NYPD
+"We are experiencing Commercial Overnight Parking (Illegal Parking) in our neighborhood, Queens.",Roads,medium,Illegal Parking,NYPD
+There is a N/A issue reported as Illegal Fireworks near my area in Brooklyn.,Security,medium,Illegal Fireworks,NYPD
+"We are experiencing Blocked Sidewalk (Illegal Parking) in our neighborhood, Queens.",Roads,medium,Illegal Parking,NYPD
+Filing a complaint regarding Trespassing under the category Non-Emergency Police Matter in Manhattan.,Security,medium,Non-Emergency Police Matter,NYPD
+"We are experiencing Construction (Noise) in our neighborhood, Brooklyn.",Security,low,Noise,DEP
+Please look into this Noise - Vehicle complaint about Car/Truck Music in Bronx.,Security,medium,Noise - Vehicle,NYPD
+Filing a complaint regarding Blocked Hydrant under the category Illegal Parking in Brooklyn.,Roads,high,Illegal Parking,NYPD
+I want to report Water Conservation - specifically Fire Hydrant Illegal Use - happening in Bronx.,Water,high,Water Conservation,DEP
+There is a Trees and Sidewalks Program issue reported as Root/Sewer/Sidewalk Condition near my area in Brooklyn.,Water,medium,Root/Sewer/Sidewalk Condition,DPR
+I want to report Illegal Dumping - specifically Removal Request - happening in Queens.,Sanitation,high,Illegal Dumping,DSNY
+"We are experiencing Alarm Chronic (Noise) in our neighborhood, Queens.",Security,low,Noise,DEP
+There is a Manhole Cover Missing issue reported as Sewer Maintenance near my area in Queens.,Water,high,Sewer Maintenance,DEP
+"We are experiencing N/A (Encampment) in our neighborhood, Brooklyn.",Security,high,Encampment,NYPD
+Filing a complaint regarding Use Outside under the category Drug Activity in Queens.,Security,high,Drug Activity,NYPD
+I want to report Obstruction - specifically Merchandise Sidewalk - happening in Manhattan.,Sanitation,medium,Obstruction,DSNY
+Urgent: Use Indoor related to Drug Activity needs attention in Manhattan.,Security,high,Drug Activity,NYPD
+Please look into this Consumer Complaint complaint about Car Rental Overcharge in Manhattan.,General Desk,low,Consumer Complaint,DCWP
+Filing a complaint regarding With License Plate under the category Abandoned Vehicle in Staten Island.,Security,medium,Abandoned Vehicle,NYPD
+"Please look into this Municipal Parking Facility complaint about Dirt, Litter, Debris - Garage in Unspecified.",Roads,medium,Municipal Parking Facility,DOT
+"We are experiencing Broken Sidewalk (Sidewalk Condition) in our neighborhood, Brooklyn.",Roads,medium,Sidewalk Condition,DOT
+Filing a complaint regarding Lead Kit under the category Lead in Brooklyn.,Water,high,Lead,DEP
+There is a Engine Idling issue reported as Noise - Vehicle near my area in Queens.,Security,medium,Noise - Vehicle,NYPD
+Urgent: Cat Street or Sidewalk related to Dead Animal needs attention in Queens.,Sanitation,medium,Dead Animal,DSNY
+I want to report Consumer Complaint - specifically Garage or Parking Lot Sign Not Displayed - happening in Manhattan.,General Desk,low,Consumer Complaint,DCWP
+"We are experiencing Pothole (Street Condition) in our neighborhood, Queens.",Roads,medium,Street Condition,DOT
+I want to report Street Condition - specifically Pothole - happening in Queens.,Roads,medium,Street Condition,DOT
+Filing a complaint regarding Pothole under the category Street Condition in Queens.,Roads,medium,Street Condition,DOT
+Urgent: Loud Talking related to Noise - Street/Sidewalk needs attention in Bronx.,Roads,low,Noise - Street/Sidewalk,NYPD
+"We are experiencing Loud Talking (Noise - Street/Sidewalk) in our neighborhood, Queens.",Roads,low,Noise - Street/Sidewalk,NYPD
+Please look into this Noise - Street/Sidewalk complaint about Loud Music/Party in Brooklyn.,Roads,low,Noise - Street/Sidewalk,NYPD
+Please look into this Noise - Residential complaint about Loud Music/Party in Staten Island.,Security,low,Noise - Residential,NYPD
+There is a Parking Permit Improper Use issue reported as Illegal Parking near my area in Brooklyn.,Roads,medium,Illegal Parking,NYPD
+There is a Commercial Overnight Parking issue reported as Illegal Parking near my area in Queens.,Roads,medium,Illegal Parking,NYPD
+Please look into this Noise - Residential complaint about Loud Talking in Queens.,Security,low,Noise - Residential,NYPD
+Please look into this Noise - Residential complaint about Loud Music/Party in Brooklyn.,Security,low,Noise - Residential,NYPD
+Urgent: Loud Talking related to Noise - Street/Sidewalk needs attention in Queens.,Roads,low,Noise - Street/Sidewalk,NYPD
+Please look into this Noise - Street/Sidewalk complaint about Loud Music/Party in Bronx.,Roads,low,Noise - Street/Sidewalk,NYPD
+I want to report Illegal Parking - specifically Blocked Crosswalk - happening in Queens.,Roads,medium,Illegal Parking,NYPD
+Filing a complaint regarding No Access under the category Blocked Driveway in Queens.,Roads,medium,Blocked Driveway,NYPD
+Filing a complaint regarding Banging/Pounding under the category Noise - Residential in Bronx.,Security,low,Noise - Residential,NYPD
+Urgent: Loud Talking related to Noise - House of Worship needs attention in Queens.,Security,low,Noise - House of Worship,NYPD
+Urgent: Banging/Pounding related to Noise - Residential needs attention in Brooklyn.,Security,low,Noise - Residential,NYPD
+"We are experiencing Banging/Pounding (Noise - Residential) in our neighborhood, Bronx.",Security,low,Noise - Residential,NYPD
+There is a Blocked Hydrant issue reported as Illegal Parking near my area in Brooklyn.,Roads,high,Illegal Parking,NYPD
+"We are experiencing Double Parked Blocking Traffic (Illegal Parking) in our neighborhood, Bronx.",Roads,medium,Illegal Parking,NYPD
+I want to report Noise - Street/Sidewalk - specifically Loud Talking - happening in Queens.,Roads,low,Noise - Street/Sidewalk,NYPD
+There is a Loud Music/Party issue reported as Noise - Street/Sidewalk near my area in Bronx.,Roads,low,Noise - Street/Sidewalk,NYPD
+"We are experiencing Banging/Pounding (Noise - Residential) in our neighborhood, Bronx.",Security,low,Noise - Residential,NYPD
+There is a Car/Truck Music issue reported as Noise - Vehicle near my area in Queens.,Security,medium,Noise - Vehicle,NYPD
