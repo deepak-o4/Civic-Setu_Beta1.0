@@ -1,6 +1,4 @@
-import torch
 import logging
-from sentence_transformers import SentenceTransformer
 import numpy as np
 from typing import List
 
@@ -12,7 +10,12 @@ class EmbeddingService:
     """
     def __init__(self, model_name: str = 'all-MiniLM-L6-v2'):
         logger.info(f"Loading embedding model: {model_name}")
-        self.model = SentenceTransformer(model_name)
+        try:
+            from sentence_transformers import SentenceTransformer
+            self.model = SentenceTransformer(model_name)
+        except ImportError:
+            logger.warning("SentenceTransformers is unavailable; using API/fallback classification.")
+            self.model = None
         
     def generate_embeddings(self, texts: List[str]) -> np.ndarray:
         """
@@ -20,5 +23,7 @@ class EmbeddingService:
         """
         logger.info(f"Generating embeddings for {len(texts)} texts...")
         # show_progress_bar=True helps track progress for large datasets
+        if self.model is None:
+            return np.empty((0, 0))
         embeddings = self.model.encode(texts, show_progress_bar=True)
         return embeddings

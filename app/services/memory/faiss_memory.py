@@ -3,7 +3,6 @@ import sys
 import logging
 import pickle
 from typing import List, Dict, Any
-from sentence_transformers import SentenceTransformer
 import numpy as np
 
 logger = logging.getLogger("civicsetu.services.memory.faiss")
@@ -22,9 +21,12 @@ class FaissMemory:
         self.index_path = index_path
         self.metadata_path = metadata_path
 
-        self.embedding_model = SentenceTransformer(
-    "sentence-transformers/all-MiniLM-L6-v2"
-)
+        try:
+            from sentence_transformers import SentenceTransformer
+            self.embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+        except ImportError:
+            logger.warning("SentenceTransformers is unavailable; vector search is disabled.")
+            self.embedding_model = None
         
         # Core storage variables initialized as None to delay import-time execution
         self._faiss_module = None
@@ -91,6 +93,8 @@ class FaissMemory:
 ):
 
      try:
+        if self.embedding_model is None:
+            return []
         self._lazy_init_faiss()
      except RuntimeError:
         return []
