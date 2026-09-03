@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.render.txt
-    startCommand: alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port $PORT
+    startCommand: alembic upgrade head && python seed_db.py && uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/v1/health
     envVars:
       - key: PYTHON_VERSION
