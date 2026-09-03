@@ -12,12 +12,7 @@ def sync_send_email(email_to: str, subject: str, html_content: str) -> None:
     Synchronous email dispatch using smtplib.
     """
     if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
-        logger.warning(
-            f"\n[MOCK EMAIL DISPATCH] To: {email_to}\n"
-            f"Subject: {subject}\n"
-            f"Body:\n{html_content}\n"
-        )
-        return
+        raise RuntimeError("SMTP_USER and SMTP_PASSWORD are not configured")
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
