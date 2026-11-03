@@ -2,7 +2,8 @@ import axios from 'axios';
 import { API_ORIGIN } from '../utils/url';
 
 // --- Configuration ---
-const API_TIMEOUT = 10000; // 10 seconds
+// Render's free instance can take up to a minute to wake after idle.
+const API_TIMEOUT = 60000;
 
 // Extended timeouts for longer operations
 const SUBMIT_COMPLAINT_TIMEOUT = 30000; // 30 seconds
